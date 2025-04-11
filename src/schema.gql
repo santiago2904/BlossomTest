@@ -1,0 +1,44 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CharacterFilterInput {
+  gender: String
+  name: String
+  origin: String
+  species: String
+  status: String
+}
+
+type CharacterType {
+  created: DateTime
+  episode: [String!]
+  gender: String
+  id: Float!
+  image: String
+  location: String
+  name: String!
+  origin: String
+  species: String
+  status: String
+  type: String
+  url: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PaginatedCharacters {
+  count: Float!
+  next: String
+  prev: String
+  results: [CharacterType!]!
+}
+
+type Query {
+  character(id: Int!): CharacterType
+  characters(filter: CharacterFilterInput): PaginatedCharacters!
+  charactersFromDb(filter: CharacterFilterInput): [CharacterType!]!
+}
