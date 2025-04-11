@@ -98,7 +98,7 @@ npm run migration:run
 
 5. Iniciar la aplicación:
 ```bash
-npm run start:dev
+npm run dev
 ```
 
 ## Documentación y Uso
