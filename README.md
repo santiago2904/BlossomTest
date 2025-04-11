@@ -1,124 +1,161 @@
 # Rick and Morty API
 
-## Introducción
-Este proyecto es una API GraphQL que proporciona acceso a información sobre personajes de la serie Rick and Morty. La API permite consultar personajes tanto desde la API pública de Rick and Morty como desde una base de datos local, ofreciendo flexibilidad y rendimiento optimizado.
+## Introduction
+This project is a GraphQL API that provides access to information about characters from the Rick and Morty series. The API allows querying characters both from the public Rick and Morty API and from a local database, offering flexibility and optimized performance.
 
-## Requisitos
-- Node.js (v14 o superior)
-- npm o yarn
-- Redis (para caché)
-- PostgreSQL
+## Requirements
+- Node.js (v14 or higher)
+- npm or yarn
+- PostgreSQL (v14 or higher)
+- Redis (v6 or higher)
 
-## Estructura del Proyecto
-El proyecto está organizado siguiendo los principios de Clean Architecture y está dividido en los siguientes módulos:
+## Project Structure
+The project is organized following Clean Architecture principles and is divided into the following modules:
 
 ```
 src/
-├── config/           # Configuraciones de la aplicación
-├── common/           # Utilidades y middleware comunes
-├── database/         # Configuración y conexión a la base de datos
-├── interfaces/       # Interfaces y tipos TypeScript
-├── modules/          # Módulos de la aplicación
-│   └── characters/   # Módulo de personajes
+├── config/           # Application configurations
+├── common/           # Common utilities and middleware
+├── database/         # Database configuration and connection
+├── interfaces/       # TypeScript interfaces and types
+├── modules/          # Application modules
+│   └── characters/   # Characters module
 │       ├── dto/      # Data Transfer Objects
-│       ├── entities/ # Entidades de la base de datos
-│       ├── providers/# Proveedores de servicios
-│       ├── repositories/ # Repositorios de datos
-│       ├── resolvers/    # Resolvers de GraphQL
-│       └── services/     # Lógica de negocio
-├── schema.gql        # Esquema GraphQL
-└── app.module.ts     # Módulo principal de la aplicación
+│       ├── entities/ # Database entities
+│       ├── providers/# Service providers
+│       ├── repositories/ # Data repositories
+│       ├── resolvers/    # GraphQL resolvers
+│       └── services/     # Business logic
+├── schema.gql        # GraphQL schema
+└── app.module.ts     # Main application module
 ```
 
-## Características Implementadas
-- Consulta de personajes con filtros avanzados
-- Paginación de resultados
-- Caché de datos en Redis
-- Logging de consultas
-- Validación de datos
-- Documentación GraphQL
+## Implemented Features
+- Character querying with advanced filters
+- Results pagination
+- Redis data caching
+- Query logging
+- Data validation
+- GraphQL documentation
 
-## Requisitos Opcionales Implementados
-1. **Cron Job para Actualización de Datos**
-   - Implementado en `src/modules/characters/services/characters-updater.service.ts`
-   - Se ejecuta cada 12 horas para mantener la base de datos actualizada
+## Optional Requirements Implemented
+1. **Cron Job for Data Update**
+   - Implemented in `src/modules/characters/services/characters-updater.service.ts`
+   - Runs every 12 hours to keep the database updated
 
-2. **Decorador de Métodos para Medición de Tiempo**
-   - Implementado en `src/common/decorators/measure-time.decorator.ts`
-   - Mide y registra el tiempo de ejecución de las consultas
+2. **Method Decorator for Time Measurement**
+   - Implemented in `src/common/decorators/measure-time.decorator.ts`
+   - Measures and logs query execution time
 
-3. **Patrón de Diseño Strategy**
-   - Implementado en `src/modules/characters/strategies/character-data.strategy.ts`
-   - Permite cambiar dinámicamente el comportamiento de las consultas de personajes
-   - Facilita la extensión para nuevos tipos de búsqueda
+3. **Strategy Design Pattern**
+   - Implemented in `src/modules/characters/strategies/character-data.strategy.ts`
+   - Allows dynamic change of character query behavior
+   - Facilitates extension for new search types
 
-## Cómo Iniciar el Proyecto
+## Project Configuration
 
-1. Clonar el repositorio:
+### Environment Variables
+Create a `.env` file in the project root with the following variables:
+
+```env
+# PostgreSQL
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=rickandmorty
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# API
+PORT=3000
+RICK_AND_MORTY_API_URL=https://rickandmortyapi.com/api
+```
+
+### Using Docker (Recommended)
+If you have Docker installed, you can start the required services with these commands. The environment variable values must match those defined in your `.env` file:
+
 ```bash
-git clone [url-del-repositorio]
+# Start PostgreSQL
+docker run --name postgres-rickandmorty \
+  -e POSTGRES_USER=${POSTGRES_USER} \
+  -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+  -e POSTGRES_DB=${POSTGRES_DB} \
+  -p ${POSTGRES_PORT}:5432 \
+  -d postgres:14
+
+# Start Redis
+docker run --name redis-rickandmorty \
+  -p ${REDIS_PORT}:6379 \
+  -d redis:6
+```
+
+### Manual Configuration
+If you prefer using local installations:
+
+1. **PostgreSQL**
+   - Install PostgreSQL 14 or higher
+   - Create a database with the name specified in `POSTGRES_DB`
+   - Configure user and password according to environment variables
+
+2. **Redis**
+   - Install Redis 6 or higher
+   - Ensure it's running on the port specified in `REDIS_PORT`
+
+### Service Verification
+To verify that services are running correctly:
+
+```bash
+# Verify PostgreSQL
+psql -h ${POSTGRES_HOST} -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+
+# Verify Redis
+redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} ping
+```
+
+## Installation and Execution
+
+1. Clone the repository:
+```bash
+git clone [repository-url]
 cd rick-and-morty-api
 ```
 
-2. Instalar dependencias:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Configurar variables de entorno:
-```bash
-cp .env.example .env
-```
-
-Ejemplo de archivo .env:
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_NAME=rick_and_morty_db
-
-# Redis Configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# API Configuration
-PORT=3000
-NODE_ENV=development
-
-# Rick and Morty API
-RICK_AND_MORTY_API_URL=https://rickandmortyapi.com/api
-```
-
-4. Ejecutar migraciones de la base de datos:
+3. Run database migrations:
 ```bash
 npm run migration:run
 ```
 
-5. Iniciar la aplicación:
+4. Start the application:
 ```bash
 npm run dev
 ```
 
-## Documentación y Uso
+## Documentation and Usage
 
-### Acceso a la Documentación
-La documentación de la API está disponible en:
+### Accessing Documentation
+The API documentation is available at:
 ```
 http://localhost:3000/graphql
 ```
 
-### Importar Schema en Postman
-1. Abre Postman
-2. Crea una nueva colección
-3. Ve a la pestaña "APIs"
-4. Importa el archivo `src/schema.gql`
-5. Configura la URL base como `http://localhost:3000/graphql`
+### Import Schema in Postman
+1. Open Postman
+2. Create a new collection
+3. Go to the "APIs" tab
+4. Import the `src/schema.gql` file
+5. Set the base URL to `http://localhost:3000/graphql`
 
-### Queries Disponibles
+### Available Queries
 
-1. **Obtener un Personaje por ID**
+1. **Get Character by ID**
 ```graphql
 query {
   character(id: 1) {
@@ -133,7 +170,7 @@ query {
 }
 ```
 
-2. **Buscar Personajes con Filtros**
+2. **Search Characters with Filters**
 ```graphql
 query {
   characters(filter: {
@@ -152,7 +189,7 @@ query {
 }
 ```
 
-3. **Obtener Personajes desde la Base de Datos**
+3. **Get Characters from Database**
 ```graphql
 query {
   charactersFromDb(filter: {
@@ -165,33 +202,25 @@ query {
 }
 ```
 
+## Unit Tests Status
+The project has unit tests implemented for the main character service (`CharactersService`). The tests focus on the most important and critical cases of the service.
 
-## URL de Producción
-La API está desplegada en:
-```
-https://rick-and-morty-api.example.com/graphql
-```
+### Implemented Tests
+1. **Service Definition Test**
+   - Verifies that the service initializes correctly
+   - Location: `src/modules/characters/services/characters.service.spec.ts`
 
+2. **Default API Strategy Test**
+   - Verifies that the service uses the API strategy by default
+   - Tests character retrieval from the external API
+   - Location: `src/modules/characters/services/characters.service.spec.ts`
 
-## Licencia
-Este proyecto está bajo la licencia MIT.
+3. **Error Handling Test**
+   - Verifies behavior when both strategies (API and database) fail
+   - Ensures an empty result is returned in case of error
+   - Location: `src/modules/characters/services/characters.service.spec.ts`
 
-## Estado de las Pruebas Unitarias
-El proyecto tiene pruebas unitarias implementadas para el servicio principal de personajes (`CharactersService`). Las pruebas se centran en los casos más importantes y críticos del servicio.
-
-### Pruebas Implementadas
-1. **Prueba de Definición del Servicio**
-   - Verifica que el servicio se inicialice correctamente
-   - Ubicación: `src/modules/characters/services/characters.service.spec.ts`
-
-2. **Prueba de Estrategia de API por Defecto**
-   - Verifica que el servicio use la estrategia de API por defecto
-   - Prueba la obtención de personajes desde la API externa
-   - Ubicación: `src/modules/characters/services/characters.service.spec.ts`
-
-3. **Prueba de Manejo de Errores**
-   - Verifica el comportamiento cuando ambas estrategias (API y base de datos) fallan
-   - Asegura que se devuelva un resultado vacío en caso de error
-   - Ubicación: `src/modules/characters/services/characters.service.spec.ts`
+## License
+This project is licensed under the MIT License.
 
 
